@@ -1,0 +1,24 @@
+.App-header {
+  background-color: #282c34;
+  height: 3.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 3em 0;
+}
+
+.sidebar {
+  padding: 1em;
+  width: 250px;
+
+  .submenu {
+    margin-left: 1em;
+    min-height: 1.5em;
+  }
+
+  .highlighted {
+    background-color: pink;
+  }
+}
