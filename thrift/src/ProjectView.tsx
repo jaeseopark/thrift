@@ -58,28 +58,31 @@ const Row = ({
   const [editThickness, setEditThickness] = useState(thickness ? toHumanFormat(thickness) : "");
   const [editWidth, setEditWidth] = useState(width ? toHumanFormat(width) : "");
   const [editLength, setEditLength] = useState(length ? toHumanFormat(length) : "");
-  const [editQuantity, setEditQuantity] = useState(requirement?.quantity || 1);
 
   const [showUpdateIndicator, setShowUpdateIndicator] = useState(false);
 
   const isReadyToSave = useMemo(() => {
     if (abstractMaterial && thickness && width && length && quantity > 0) {
       if (!requirement) {
+        // this is the 'new row' scenario.
         return true;
       }
-      const isDirty =
+
+      // this is the 'existing row' scenario. ie. only ready to save if the values have changed.
+      return (
         abstractMaterial.id !== requirement.abstractMaterialId ||
         !equals(thickness, requirement.thickness) ||
         !equals(width, requirement.width) ||
         !equals(length, requirement.length) ||
-        quantity !== requirement.quantity;
-
-      return isDirty;
+        quantity !== requirement.quantity
+      );
     }
     return false;
   }, [abstractMaterial, thickness, width, length, quantity, requirement]);
 
   useEffect(() => {
+    // TODO: debounce
+
     if (onChange && isReadyToSave) {
       onChange(getNewRequirement()!);
       setShowUpdateIndicator(true);
@@ -109,7 +112,7 @@ const Row = ({
     setEditThickness("");
     setEditWidth("");
     setEditLength("");
-    setEditQuantity(1);
+    setQuantity(1);
   };
 
   return (
@@ -128,38 +131,58 @@ const Row = ({
         <Input
           type="text"
           value={editThickness}
-          onChange={(e) => setEditThickness(e.target.value)}
-          onBlur={() => setThickness(toPreferredMeasurement(editThickness))}
           placeholder='Example: 3/4" or 19 mm'
+          onChange={(e) => {
+            setEditThickness(e.target.value);
+            setThickness(toPreferredMeasurement(e.target.value));
+          }}
+          onBlur={() => {
+            if (thickness) {
+              setEditThickness(toHumanFormat(thickness));
+            }
+          }}
         />
       </Td>
       <Td>
         <Input
           type="text"
           value={editWidth}
-          onChange={(e) => setEditWidth(e.target.value)}
-          onBlur={() => setWidth(toPreferredMeasurement(editWidth))}
           placeholder='Example: 9 3/4" or 248 mm'
+          onChange={(e) => {
+            setEditWidth(e.target.value);
+            setWidth(toPreferredMeasurement(e.target.value));
+          }}
+          onBlur={() => {
+            if (width) {
+              setEditWidth(toHumanFormat(width));
+            }
+          }}
         />
       </Td>
       <Td>
         <Input
           type="text"
           value={editLength}
-          onChange={(e) => setEditLength(e.target.value)}
-          onBlur={() => setLength(toPreferredMeasurement(editLength))}
           placeholder='Example: 64" or 1626 mm'
+          onChange={(e) => {
+            setEditLength(e.target.value);
+            setLength(toPreferredMeasurement(e.target.value));
+          }}
+          onBlur={() => {
+            if (length) {
+              setEditLength(toHumanFormat(length));
+            }
+          }}
         />
       </Td>
       <Td>
         <Input
           type="number"
-          value={editQuantity}
-          onChange={(e) => setEditQuantity(e.target.valueAsNumber)}
-          onBlur={() => setQuantity(editQuantity)}
+          value={quantity}
           min={0}
           max={10000}
           step={1}
+          onChange={(e) => setQuantity(e.target.valueAsNumber)}
         />
       </Td>
       <Td>
