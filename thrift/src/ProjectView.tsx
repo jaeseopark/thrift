@@ -53,12 +53,12 @@ const Row = ({
   const [thickness, setThickness] = useState(requirement?.thickness);
   const [width, setWidth] = useState(requirement?.width);
   const [length, setLength] = useState(requirement?.length);
-  const [quantity, setQuantity] = useState(requirement?.quantity || 0);
+  const [quantity, setQuantity] = useState(requirement?.quantity || 1);
 
   const [editThickness, setEditThickness] = useState(thickness ? toHumanFormat(thickness) : "");
   const [editWidth, setEditWidth] = useState(width ? toHumanFormat(width) : "");
   const [editLength, setEditLength] = useState(length ? toHumanFormat(length) : "");
-  const [editQuantity, setEditQuantity] = useState(requirement?.quantity || 0);
+  const [editQuantity, setEditQuantity] = useState(requirement?.quantity || 1);
 
   const [showUpdateIndicator, setShowUpdateIndicator] = useState(false);
 
@@ -109,7 +109,7 @@ const Row = ({
     setEditThickness("");
     setEditWidth("");
     setEditLength("");
-    setEditQuantity(0);
+    setEditQuantity(1);
   };
 
   return (
