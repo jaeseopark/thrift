@@ -1,8 +1,10 @@
 import { Dispatch, createContext, useContext, useEffect, useReducer } from "react";
+import InventoryList from "./ProjectList";
 
 import {
   AbstractMaterial,
   MaterialRequirement,
+  PhysicalMaterial,
   Project,
   ProjectHeaderProps,
   SCHEMA_VERSION,
@@ -15,30 +17,36 @@ const LOCAL_STORAGE_KEY = `thrift-v${SCHEMA_VERSION}`;
 
 type ThriftDataOperation =
   | {
-      type: "ADD_PROJECT";
-    }
+    type: "ADD_PROJECT";
+  }
   | {
-      type: "EDIT_PROJECT";
-      payload: ProjectHeaderProps;
-    }
+    type: "EDIT_PROJECT";
+    payload: ProjectHeaderProps;
+  }
   | {
-      type: "ADD_MATERIAL_TO_PROJECT";
-      payload: {
-        projectId: string;
-        requirement: MaterialRequirement;
-      };
-    }
+    type: "ADD_MATERIAL_TO_PROJECT";
+    payload: {
+      projectId: string;
+      requirement: MaterialRequirement;
+    };
+  } | {
+    type: "ADD_MATERIAL_TO_INVENTORY",
+    payload: PhysicalMaterial
+  }
   | {
-      type: "UPDATE_MATERIAL_IN_PROJECT";
-      payload: {
-        projectId: string;
-        requirement: MaterialRequirement;
-      };
-    }
+    type: "UPDATE_MATERIAL_IN_PROJECT";
+    payload: {
+      projectId: string;
+      requirement: MaterialRequirement;
+    };
+  } | {
+    type: "UPDATE_MATERIAL_IN_INVENTORY",
+    payload: PhysicalMaterial
+  }
   | {
-      type: "SET_PREFERRED_UNIT";
-      payload: Unit;
-    }
+    type: "SET_PREFERRED_UNIT";
+    payload: Unit;
+  }
   | { type: "SET_STATE"; payload: State };
 
 const blank: State = {
@@ -109,6 +117,11 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
         projects,
       };
     }
+    case "ADD_MATERIAL_TO_INVENTORY":
+      return {
+        ...state,
+        inventory: [...state.inventory, operation.payload]
+      }
     case "UPDATE_MATERIAL_IN_PROJECT": {
       const projects = state.projects.reduce((accProjects, nextProject) => {
         let elementToPush = nextProject;
@@ -135,6 +148,17 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
         projects,
       };
     }
+    case "UPDATE_MATERIAL_IN_INVENTORY":
+      return {
+        ...state,
+        inventory: state.inventory.reduce((acc, next) => {
+          let toPush = next;
+          if (toPush.id === operation.payload.id) {
+            toPush = operation.payload;
+          }
+          return acc;
+        }, [] as PhysicalMaterial[])
+      }
     case "SET_PREFERRED_UNIT":
       return {
         ...state,
@@ -164,11 +188,13 @@ export const useData = () => {
       dispatch!({ type: "EDIT_PROJECT", payload: projectHeaderProps }),
     addMaterialToProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
       dispatch!({ type: "ADD_MATERIAL_TO_PROJECT", payload }),
+    addMaterialToInventory: (material: PhysicalMaterial) => dispatch!({ type: "ADD_MATERIAL_TO_INVENTORY", payload: material }),
     updateMaterialInProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
       dispatch!({ type: "UPDATE_MATERIAL_IN_PROJECT", payload }),
+    updateMaterialInInventory: (material: PhysicalMaterial) => dispatch!({ type: "UPDATE_MATERIAL_IN_INVENTORY", payload: material }),
     setPreferredUnit: (unit: Unit) => dispatch!({ type: "SET_PREFERRED_UNIT", payload: unit }),
     reset: () => dispatch!({ type: "SET_STATE", payload: blank }),
-    applySampleData: () => {},
+    applySampleData: () => { },
   };
 };
 

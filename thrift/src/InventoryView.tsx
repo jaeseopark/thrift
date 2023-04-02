@@ -9,12 +9,35 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Icon,
+  Tbody,
 } from "@chakra-ui/react";
 
+import MaterialTableShell from "./MaterialTableShell";
+import { Row } from "./ProjectRequirementView";
+import { PhysicalMaterial } from "./schema";
+import { useData } from "./useData";
 import { useGlobalDrawer } from "./useDrawer";
+
+const ExistingRow = ({ materialInHand }: { materialInHand: PhysicalMaterial }) => {
+  const { updateMaterialInInventory } = useData();
+  return (
+    <Row
+      requirement={{ ...materialInHand, shouldMaintainGrainDirection: false }}
+      onChange={(material) => {
+        updateMaterialInInventory(material);
+      }}
+    />
+  );
+};
+
+const NewRow = () => {
+  const { addMaterialToInventory } = useData();
+  return <Row onAdd={addMaterialToInventory} />;
+};
 
 const InventoryView = () => {
   const { isOpen, onOpen, onClose } = useGlobalDrawer("inventory");
+  const { inventory } = useData();
 
   return (
     <>
@@ -25,13 +48,18 @@ const InventoryView = () => {
       <Drawer placement="right" size="xl" isOpen={isOpen} onClose={onClose} closeOnEsc={false}>
         <DrawerOverlay />
         <DrawerContent>
-          <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader>Inventory</DrawerHeader>
-            <DrawerBody>
-              <div className="inventory-view">Table here</div>
-            </DrawerBody>
-          </DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Inventory</DrawerHeader>
+          <DrawerBody>
+            <MaterialTableShell>
+              <Tbody>
+                {inventory.map((materialInHand) => (
+                  <ExistingRow key={materialInHand.id} materialInHand={materialInHand} />
+                ))}
+                <NewRow />
+              </Tbody>
+            </MaterialTableShell>
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
     </>

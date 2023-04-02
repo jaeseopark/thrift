@@ -2,17 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import Select from "react-dropdown-select";
 import { MdAdd, MdOutlineDone } from "react-icons/md";
 
-import { Button, Input, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Button, Input, Tbody, Td, Tr } from "@chakra-ui/react";
 
 import { debounce } from "debounce";
 
+import MaterialTableShell from "./MaterialTableShell";
 import { AbstractMaterial, MaterialRequirement, PhysicalMaterial } from "./schema";
 import { useData } from "./useData";
 import { equals, getRandomValue, toHumanFormat, toMeasurement } from "./utils";
 
 import "./App.scss";
 
-const Row = ({
+export const Row = ({
   requirement,
   onChange,
   onAdd,
@@ -234,25 +235,13 @@ export const EditableMaterialView = ({
   requirements: MaterialRequirement[];
 }) => {
   return (
-    <div>
-      <Table>
-        <Thead>
-          <Tr>
-            <Th>Material</Th>
-            <Th>Thickness</Th>
-            <Th>Width</Th>
-            <Th>Length</Th>
-            <Th>Quantity</Th>
-            <Th />
-          </Tr>
-        </Thead>
-        <Tbody>
-          {requirements.map((requirement) => (
-            <ExistingRow key={requirement.id} projectId={projectId} requirement={requirement} />
-          ))}
-          <NewRow projectId={projectId} />
-        </Tbody>
-      </Table>
-    </div>
+    <MaterialTableShell>
+      <Tbody>
+        {requirements.map((requirement) => (
+          <ExistingRow key={requirement.id} projectId={projectId} requirement={requirement} />
+        ))}
+        <NewRow projectId={projectId} />
+      </Tbody>
+    </MaterialTableShell>
   );
 };
