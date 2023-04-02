@@ -110,6 +110,7 @@ export const convert = (measurement: Measurement, targetUnit: Unit): Measurement
 };
 
 const MEASUREMENT_REGEX = /^([0-9 \/]+)("|mm)?$/;
+const MEASUREMENT_SANITIZE_REGEX = /^(([0-9]+)|([0-9]+\/+[0-9]+)|(([0-9]+) ([0-9]+\/+[0-9]+)))$/;
 export const toMeasurement = (
   humanFormat: string,
   preferredUnit: Unit
@@ -123,20 +124,18 @@ export const toMeasurement = (
       unit = match[2].trim().replace('"', "inch");
     }
 
-    const whitespaceCount = getOccurrences(value, " ");
-
-    if (whitespaceCount < 2) {
-      let wholeNumber = 0;
-      if (whitespaceCount === 1) {
+    if (value.match(MEASUREMENT_SANITIZE_REGEX)) {
+      if (!value.includes(" ")) {
         const [whole, remainder] = value.split(" ");
-        wholeNumber = Number.parseInt(whole);
         value = remainder;
+        return {
+          value: Number.parseInt(whole) + new Fraction(remainder).valueOf(),
+          unit: unit as Unit
+        }
       }
 
-      const fraction = new Fraction(value).valueOf();
-
       return {
-        value: wholeNumber + fraction,
+        value: new Fraction(value).valueOf(),
         unit: unit as Unit,
       };
     }
