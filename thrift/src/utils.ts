@@ -143,10 +143,14 @@ export const toMeasurement = (
   }
 };
 
+const ERROR_MARGIN_BY_UNIT: { [unit: string]: number } = {
+  "inch": 1 / 32,
+  "mm": 1
+};
 export const equals = (m1: Measurement, m2: Measurement): boolean => {
   if (m1.unit !== m2.unit) {
     const m1alt = convert(m1, m2.unit);
     return equals(m1alt, m2);
   }
-  return m1.unit == m2.unit && m1.value == m2.value;
+  return m1.unit == m2.unit && Math.abs(m1.value - m2.value) < ERROR_MARGIN_BY_UNIT[m1.unit];
 };
