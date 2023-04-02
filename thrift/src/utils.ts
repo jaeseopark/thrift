@@ -109,16 +109,19 @@ export const convert = (measurement: Measurement, targetUnit: Unit): Measurement
   };
 };
 
-const MEASUREMENT_REGEX = /^([0-9 \/]*)("|mm)$/;
+const MEASUREMENT_REGEX = /^([0-9 \/]+)("|mm)?$/;
 export const toMeasurement = (
   humanFormat: string,
   preferredUnit: Unit
 ): Measurement | undefined => {
   const match = humanFormat.trim().match(MEASUREMENT_REGEX);
   if (match) {
-    let [_, value, unit] = match;
-    value = value.trim();
-    unit = unit.replace('"', "inch");
+    let value = match[1].trim();
+    let unit = preferredUnit.toString();
+
+    if (match.length > 2 && match[2]) {
+      unit = match[2].trim().replace('"', "inch");
+    }
 
     const whitespaceCount = getOccurrences(value, " ");
 
@@ -132,16 +135,10 @@ export const toMeasurement = (
 
       const fraction = new Fraction(value).valueOf();
 
-      const measurement = {
+      return {
         value: wholeNumber + fraction,
         unit: unit as Unit,
       };
-
-      if (measurement.unit === preferredUnit) {
-        return measurement;
-      }
-
-      return convert(measurement, preferredUnit);
     }
   }
 };

@@ -109,7 +109,7 @@ const Row = ({
     setEditThickness("");
     setEditWidth("");
     setEditLength("");
-    setQuantity(0);
+    setEditQuantity(0);
   };
 
   return (
@@ -130,7 +130,7 @@ const Row = ({
           value={editThickness}
           onChange={(e) => setEditThickness(e.target.value)}
           onBlur={() => setThickness(toPreferredMeasurement(editThickness))}
-          placeholder='Example: 3/4" or 19mm'
+          placeholder='Example: 3/4" or 19 mm'
         />
       </Td>
       <Td>
@@ -139,7 +139,7 @@ const Row = ({
           value={editWidth}
           onChange={(e) => setEditWidth(e.target.value)}
           onBlur={() => setWidth(toPreferredMeasurement(editWidth))}
-          placeholder='Example: 9 3/4" or 248mm'
+          placeholder='Example: 9 3/4" or 248 mm'
         />
       </Td>
       <Td>
@@ -148,7 +148,7 @@ const Row = ({
           value={editLength}
           onChange={(e) => setEditLength(e.target.value)}
           onBlur={() => setLength(toPreferredMeasurement(editLength))}
-          placeholder='Example: 64" or 1626mm'
+          placeholder='Example: 64" or 1626 mm'
         />
       </Td>
       <Td>
