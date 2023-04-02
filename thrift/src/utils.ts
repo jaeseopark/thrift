@@ -125,7 +125,7 @@ export const toMeasurement = (
     }
 
     if (value.match(MEASUREMENT_SANITIZE_REGEX)) {
-      if (!value.includes(" ")) {
+      if (value.includes(" ")) {
         const [whole, remainder] = value.split(" ");
         value = remainder;
         return {
