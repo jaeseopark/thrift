@@ -1,6 +1,6 @@
 export const SCHEMA_VERSION = "1";
 
-export type Unit = "inch" | "foot" | "mm" | "cm" | "m";
+export type Unit = "inch" | "mm";
 
 export type Measurement = {
   unit: Unit;
