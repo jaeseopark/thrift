@@ -1,29 +1,26 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import "./App.scss";
 import { Flex, Heading } from "@chakra-ui/react";
+
+import InventoryView from "./InventoryView";
+import PreferencesView from "./PreferencesView";
+import ProjectList from "./ProjectList";
 import ProjectView from "./ProjectView";
 
-const AppRoutes = () => (
-  <Routes>
-    <Route path="*" element={<Navigate to="/" replace />} />
-    <Route path="/" element={<ProjectView />} />
-    {/* <Route path="/scrape" element={<ScrapeRouteHandler />} /> */}
-  </Routes>
-);
+import "./App.scss";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Heading as="h1" size="2xl">
+        <Heading as="h1" size="2xl" color="white">
           Thrift
         </Heading>
+        <PreferencesView />
       </header>
       <div>
         <Flex flexDirection="row">
-          <Sidebar />
-          <AppRoutes />
+          <ProjectList />
+          <ProjectView />
+          <InventoryView />
         </Flex>
       </div>
     </div>

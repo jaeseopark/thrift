@@ -8,4 +8,8 @@ sudo chown -R $(whoami):$(whoami) thrift
 
 # Start the dev server up
 doker-compose up
+
+# Execute commands while docker is running. Examples:
+docker-compose exec thrift-dev npx prettier --write .
+docker-compose exec thrift-dev yarn add foobar
 ```

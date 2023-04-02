@@ -1,28 +1,29 @@
-import { Button, Heading, Spacer } from "@chakra-ui/react";
-import { useData } from "./useData";
+import { Button, Flex, Heading, Spacer } from "@chakra-ui/react";
+
 import cls from "classnames";
+
+import { useData } from "./useData";
+import { useUiData } from "./useUiData";
 import { range } from "./utils";
 
-const Sidebar = () => {
+const InventoryList = () => {
+  const { projects, addProject } = useData();
   const {
     selectedProjectIndices,
     projectMultiSelectPivotIndex,
-    projects,
-    addProject,
+
     setSelectedProjectIndices,
     setProjectMultiSelectPivotIndex,
-  } = useData();
+  } = useUiData();
 
   const onProjectClick = (e: MouseEvent, projectIndex: number) => {
     if (e.getModifierState("Shift")) {
-      setSelectedProjectIndices(
-        range(projectMultiSelectPivotIndex, projectIndex)
-      );
+      setSelectedProjectIndices(range(projectMultiSelectPivotIndex, projectIndex));
     } else if (e.getModifierState("Meta")) {
       if (!selectedProjectIndices.includes(projectIndex)) {
         setSelectedProjectIndices([...selectedProjectIndices, projectIndex]);
       } else {
-        // TODO: remove
+        setSelectedProjectIndices(selectedProjectIndices.filter((i) => i !== projectIndex));
       }
     } else {
       setProjectMultiSelectPivotIndex(projectIndex);
@@ -31,13 +32,16 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar">
-      <Heading as="h2" size="md">
-        Projects
-        <Button onClick={addProject} size="xs" className="add-project">
+    <div className="project-list">
+      <Flex>
+        <Heading as="h2" size="md">
+          Projects
+        </Heading>
+        <Spacer />
+        <Button onClick={addProject} size="xs" colorScheme="teal" className="add-project">
           +
         </Button>
-      </Heading>
+      </Flex>
       {projects.map((project, i) => (
         <Heading
           as="h5"
@@ -52,23 +56,8 @@ const Sidebar = () => {
         </Heading>
       ))}
       {!projects.length && <Spacer minHeight="1em" />}
-      <Heading as="h2" size="md">
-        Inventory
-      </Heading>
-      <Heading as="h2" size="md">
-        Data
-      </Heading>
-      <Heading as="h5" size="sm" className="submenu">
-        ✅ Backup
-      </Heading>
-      <Heading as="h5" size="sm" className="submenu">
-        ♻️ Restore
-      </Heading>
-      <Heading as="h2" size="md">
-        Preferences
-      </Heading>
     </div>
   );
 };
 
-export default Sidebar;
+export default InventoryList;

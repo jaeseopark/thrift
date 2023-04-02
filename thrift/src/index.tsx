@@ -1,24 +1,37 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
+
+import { ChakraProvider } from "@chakra-ui/react";
+
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { ChakraProvider } from "@chakra-ui/react";
-import { DataProvider } from "./useData";
+import { ThirftDataContext, useDataReducer } from "./useData";
+import { UiDataContext, useUiReducer } from "./useUiData";
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
+import "./index.css";
+
+const UiDataProvider = ({ children }: { children: JSX.Element }) => {
+  const [state, dispatch] = useUiReducer();
+  const value = { state, dispatch };
+  return <UiDataContext.Provider value={value}>{children}</UiDataContext.Provider>;
+};
+
+const DataProvider = ({ children }: { children: JSX.Element }) => {
+  const [state, dispatch] = useDataReducer();
+  const value = { state, dispatch };
+  return <ThirftDataContext.Provider value={value}>{children}</ThirftDataContext.Provider>;
+};
+
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <DataProvider>
+    <DataProvider>
+      <UiDataProvider>
         <ChakraProvider>
           <App />
         </ChakraProvider>
-      </DataProvider>
-    </BrowserRouter>
+      </UiDataProvider>
+    </DataProvider>
   </React.StrictMode>
 );
 

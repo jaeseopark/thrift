@@ -5,11 +5,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: white;
   padding: 3em 0;
 }
 
-.sidebar {
+.project-list {
   padding: 1em;
   width: 250px;
 
@@ -21,4 +20,16 @@
   .highlighted {
     background-color: pink;
   }
+}
+
+.inventory-view {
+  width: 30vw;
+
+  &.collapsed {
+    width: 30px;
+  }
+}
+
+.project-view {
+  width: 100%;
 }

@@ -1,31 +1,155 @@
+import Fraction from "fraction.js";
+
+import { AbstractMaterial, ImperialPrecision, Measurement, Unit } from "./schema";
+
 export const getRandomValue = (len: number = 36) => {
-    var arr = new Uint8Array((len || 40) / 2);
-    window.crypto.getRandomValues(arr);
-    return Array.from(arr, (dec) => dec.toString(16).padStart(2, "0")).join("");
+  var arr = new Uint8Array((len || 40) / 2);
+  window.crypto.getRandomValues(arr);
+  return Array.from(arr, (dec) => dec.toString(16).padStart(2, "0")).join("");
 };
 
 export const getNewProjectName = (existingProjectNames: string[]): string => {
-    const NEW_PROJECT = "New Project";
-    if (!existingProjectNames.includes(NEW_PROJECT)) {
-        return NEW_PROJECT;
-    }
+  const NEW_PROJECT = "New Project";
+  if (!existingProjectNames.includes(NEW_PROJECT)) {
+    return NEW_PROJECT;
+  }
 
-    for (let i = 2; i < 1000; i++) {
-        const newName = `${NEW_PROJECT} ${i}`;
-        if (!existingProjectNames.includes(newName)) {
-            return newName;
-        }
+  // TOOD: replace with regex (find the highest integer, then +1)
+  for (let i = 2; i < 1000; i++) {
+    const newName = `${NEW_PROJECT} ${i}`;
+    if (!existingProjectNames.includes(newName)) {
+      return newName;
     }
+  }
 
-    return "aaaaaaaaaa";
+  return NEW_PROJECT;
 };
 
 export const range = (start: number, end: number) => {
-    const min = Math.min(start, end);
-    const max = Math.max(start, end);
-    const arr = [];
-    for (let i = min; i <= max; i++) {
-        arr.push(i);
+  const min = Math.min(start, end);
+  const max = Math.max(start, end);
+  const arr = [];
+  for (let i = min; i <= max; i++) {
+    arr.push(i);
+  }
+  return arr;
+};
+
+export const getDefaultMaterialCatalog = (): AbstractMaterial[] => {
+  const catalog: AbstractMaterial[] = [];
+
+  ["MDF", "Melamine"].forEach((sheetType) =>
+    catalog.push({
+      id: getRandomValue(),
+      name: sheetType,
+      type: "SHEET",
+      hasGrainDirection: false,
+    })
+  );
+
+  ["Birch", "Baltic Birch", "Walnut"].forEach((plywoodType) => {
+    catalog.push({
+      id: getRandomValue(),
+      name: `[Plywood] ${plywoodType}`,
+      type: "SHEET",
+      hasGrainDirection: true,
+    });
+  });
+
+  [
+    "Ash",
+    "Cherry",
+    "Maple",
+    "Walnut",
+    "Walnut - Black",
+    "Oak - Red",
+    "Oak - White",
+    "Poplar",
+  ].forEach((woodtype) => {
+    catalog.push({
+      id: getRandomValue(),
+      name: `[Solid] ${woodtype}`,
+      type: "SOLID_WOOD",
+      hasGrainDirection: true,
+    });
+  });
+
+  catalog.sort((a, b) => a.name.localeCompare(b.name));
+
+  return catalog;
+};
+
+export const toHumanFormat = (length: Measurement): string => {
+  switch (length.unit) {
+    case "mm":
+      return length.value.toFixed(0) + " mm";
+    case "inch":
+      return new Fraction(length.value).toFraction(true) + '"';
+    default:
+      throw new Error("Unsupported type: " + length.unit);
+  }
+};
+
+export const getOccurrences = (text: string, substring: string): number => {
+  const match = text.match(new RegExp(substring));
+  if (match) {
+    return match.length;
+  }
+  return 0;
+};
+
+const CONVERSION_RATES: { [key: string]: number } = {
+  "inch->mm": 25.4,
+  "mm->inch": 1 / 25.4,
+};
+export const convert = (measurement: Measurement, targetUnit: Unit): Measurement => {
+  return {
+    value: measurement.value * CONVERSION_RATES[`${measurement.unit}->${targetUnit}`],
+    unit: targetUnit,
+  };
+};
+
+const MEASUREMENT_REGEX = /^([0-9 \/]*)("|mm)$/;
+export const toMeasurement = (
+  humanFormat: string,
+  preferredUnit: Unit
+): Measurement | undefined => {
+  const match = humanFormat.trim().match(MEASUREMENT_REGEX);
+  if (match) {
+    let [_, value, unit] = match;
+    value = value.trim();
+    unit = unit.replace('"', "inch");
+
+    const whitespaceCount = getOccurrences(value, " ");
+
+    if (whitespaceCount < 2) {
+      let wholeNumber = 0;
+      if (whitespaceCount === 1) {
+        const [whole, remainder] = value.split(" ");
+        wholeNumber = Number.parseInt(whole);
+        value = remainder;
+      }
+
+      const fraction = new Fraction(value).valueOf();
+
+      const measurement = {
+        value: wholeNumber + fraction,
+        unit: unit as Unit,
+      };
+
+      if (measurement.unit === preferredUnit) {
+        return measurement;
+      }
+
+      return convert(measurement, preferredUnit);
     }
-    return arr;
-}
+  }
+};
+
+export const equals = (m1: Measurement, m2: Measurement): boolean => {
+  if (m1.unit !== m2.unit) {
+    const m1alt = convert(m1, m2.unit);
+    return equals(m1alt, m2);
+  }
+  return m1.unit == m2.unit && m1.value == m2.value;
+};
