@@ -4,6 +4,8 @@ import { MdAdd, MdOutlineDone } from "react-icons/md";
 
 import { Button, Input, Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 
+import { debounce } from "debounce";
+
 import { AbstractMaterial, MaterialRequirement, PhysicalMaterial } from "./schema";
 import { useData } from "./useData";
 import { equals, getRandomValue, toHumanFormat, toMeasurement } from "./utils";
@@ -56,15 +58,17 @@ const Row = ({
   }, [abstractMaterial, thickness, width, length, quantity, requirement]);
 
   useEffect(() => {
-    // TODO: debounce
-
-    if (onChange && isReadyToSave) {
-      onChange(getNewRequirement()!);
+    const save = debounce(() => {
+      onChange!(getNewRequirement()!);
       setShowUpdateIndicator(true);
       setTimeout(() => {
         // hide the indicator after 2000ms.
         setShowUpdateIndicator(false);
       }, 2000);
+    }, 1250);
+
+    if (onChange && isReadyToSave) {
+      save();
     }
   }, [isReadyToSave]);
 
