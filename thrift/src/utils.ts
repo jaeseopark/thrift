@@ -130,8 +130,8 @@ export const toMeasurement = (
         value = remainder;
         return {
           value: Number.parseInt(whole) + new Fraction(remainder).valueOf(),
-          unit: unit as Unit
-        }
+          unit: unit as Unit,
+        };
       }
 
       return {
@@ -143,8 +143,8 @@ export const toMeasurement = (
 };
 
 const ERROR_MARGIN_BY_UNIT: { [unit: string]: number } = {
-  "inch": 1 / 32,
-  "mm": 1
+  inch: 1 / 32,
+  mm: 1,
 };
 export const equals = (m1: Measurement, m2: Measurement): boolean => {
   if (m1.unit !== m2.unit) {
