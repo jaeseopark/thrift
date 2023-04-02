@@ -1,48 +1,39 @@
-import { Button, Flex, Heading, Input, Spacer, useDisclosure } from "@chakra-ui/react";
+import { MdInventory } from "react-icons/md";
+
 import {
+  Box,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  Icon,
 } from "@chakra-ui/react";
 
 import { useGlobalDrawer } from "./useDrawer";
 
 const InventoryView = () => {
-  // const { isOpen, onOpen, onClose } = useGlobalDrawer("inventory");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useGlobalDrawer("inventory");
 
   return (
     <>
-      <Drawer placement="right" size="md" isOpen={isOpen} onClose={onClose}>
+      <Box className="button-container" onClick={onOpen}>
+        <Icon as={MdInventory} width="100%" height="100%" />
+      </Box>
+
+      <Drawer placement="right" size="xl" isOpen={isOpen} onClose={onClose} closeOnEsc={false}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerContent>
             <DrawerCloseButton />
-            <DrawerHeader>Create your account</DrawerHeader>
+            <DrawerHeader>Inventory</DrawerHeader>
             <DrawerBody>
-              <Input placeholder="Type here..." />
+              <div className="inventory-view">Table here</div>
             </DrawerBody>
-            <DrawerFooter>
-              <Button colorScheme="blue">Save</Button>
-            </DrawerFooter>
           </DrawerContent>
         </DrawerContent>
       </Drawer>
-      <div className="inventory-view">
-        <Flex>
-          <Heading as="h2" size="md" marginTop="1em">
-            Inventory
-          </Heading>
-          <Spacer />
-          <Button size="xs" colorScheme="teal" onClick={onOpen}>
-            +
-          </Button>
-        </Flex>
-      </div>
     </>
   );
 };

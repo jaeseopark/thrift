@@ -1,6 +1,7 @@
+import { BsFillGearFill } from "react-icons/bs";
 import { GrDocumentTest } from "react-icons/gr";
 import { ImDownload3 } from "react-icons/im";
-import { MdBuild, MdOutlineRestore } from "react-icons/md";
+import { MdOutlineRestore } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
 
 import {
@@ -27,17 +28,6 @@ import { useData } from "./useData";
 import { useGlobalDrawer } from "./useDrawer";
 import { useUiData } from "./useUiData";
 
-const TriggerButton = styled.div`
-  position: absolute;
-  right: 1em;
-  width: 2.5em;
-  height: 2.5em;
-  padding: 0.5em;
-  background-color: white;
-  border-radius: 0.25em;
-  // TODO: button alignment
-`;
-
 const FullWidthButton = styled(Button)`
   width: 100%;
 `;
@@ -50,9 +40,9 @@ const DataMgmtView = () => {
   return (
     <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
       <PopoverTrigger>
-        <TriggerButton>
-          <Icon as={MdBuild} />
-        </TriggerButton>
+        <Box className="button-container">
+          <Icon as={BsFillGearFill} width="100%" height="100%" />
+        </Box>
       </PopoverTrigger>
       <PopoverContent p={5}>
         <FocusLock persistentFocus={false}>

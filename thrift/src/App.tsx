@@ -1,4 +1,6 @@
-import { Flex, Heading } from "@chakra-ui/react";
+import { Flex, HStack, Heading } from "@chakra-ui/react";
+
+import styled from "styled-components";
 
 import InventoryView from "./InventoryView";
 import PreferencesView from "./PreferencesView";
@@ -7,6 +9,19 @@ import ProjectView from "./ProjectView";
 
 import "./App.scss";
 
+const CornerMenu = styled(HStack)`
+  position: absolute;
+  right: 2.5em;
+
+  .button-container {
+    width: 2.5em;
+    height: 2.5em;
+    padding: 0.5em;
+    background-color: white;
+    border-radius: 0.25em;
+  }
+`;
+
 function App() {
   return (
     <div className="App">
@@ -14,15 +29,15 @@ function App() {
         <Heading as="h1" size="2xl" color="white">
           Thrift
         </Heading>
-        <PreferencesView />
-      </header>
-      <div>
-        <Flex flexDirection="row">
-          <ProjectList />
-          <ProjectView />
+        <CornerMenu>
           <InventoryView />
-        </Flex>
-      </div>
+          <PreferencesView />
+        </CornerMenu>
+      </header>
+      <Flex flexDirection="row">
+        <ProjectList />
+        <ProjectView />
+      </Flex>
     </div>
   );
 }

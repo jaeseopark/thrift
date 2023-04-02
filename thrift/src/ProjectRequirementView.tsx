@@ -65,7 +65,7 @@ const Row = ({
         // hide the indicator after 2000ms.
         setShowUpdateIndicator(false);
       }, 2000);
-    }, 1250);
+    }, 1000);
 
     if (onChange && isReadyToSave) {
       save();
@@ -164,9 +164,11 @@ const Row = ({
         <Input
           type="number"
           value={quantity}
-          min={0}
+          min={1}
           max={10000}
           step={1}
+          isInvalid={quantity < 1}
+          errorBorderColor="red.500"
           onChange={(e) => setQuantity(e.target.valueAsNumber)}
         />
       </Td>
