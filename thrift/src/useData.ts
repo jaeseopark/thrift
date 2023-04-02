@@ -2,7 +2,6 @@ import { Dispatch, createContext, useContext, useEffect, useReducer } from "reac
 
 import {
   AbstractMaterial,
-  ImperialPrecision,
   MaterialRequirement,
   Project,
   ProjectHeaderProps,
@@ -40,10 +39,6 @@ type ThriftDataOperation =
       type: "SET_PREFERRED_UNIT";
       payload: Unit;
     }
-  | {
-      type: "SET_IMPERIAL_PRECSION";
-      payload: ImperialPrecision;
-    }
   | { type: "SET_STATE"; payload: State };
 
 const blank: State = {
@@ -51,7 +46,6 @@ const blank: State = {
   inventory: [],
   catalog: getDefaultMaterialCatalog(),
   preferredUnit: "inch",
-  imperialPrecision: 8,
 };
 
 const initialState: State =
@@ -146,11 +140,6 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
         ...state,
         preferredUnit: operation.payload,
       };
-    case "SET_IMPERIAL_PRECSION":
-      return {
-        ...state,
-        imperialPrecision: operation.payload,
-      };
     case "SET_STATE":
       return operation.payload;
     default:
@@ -178,8 +167,6 @@ export const useData = () => {
     updateMaterialInProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
       dispatch!({ type: "UPDATE_MATERIAL_IN_PROJECT", payload }),
     setPreferredUnit: (unit: Unit) => dispatch!({ type: "SET_PREFERRED_UNIT", payload: unit }),
-    setImperialPrecision: (precision: ImperialPrecision) =>
-      dispatch!({ type: "SET_IMPERIAL_PRECSION", payload: precision }),
     reset: () => dispatch!({ type: "SET_STATE", payload: blank }),
     applySampleData: () => {},
   };

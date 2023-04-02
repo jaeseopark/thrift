@@ -22,7 +22,7 @@ import {
 
 import styled from "styled-components";
 
-import { ImperialPrecision, Unit } from "./schema";
+import { Unit } from "./schema";
 import { useData } from "./useData";
 import { useGlobalDrawer } from "./useDrawer";
 import { useUiData } from "./useUiData";
@@ -44,14 +44,7 @@ const FullWidthButton = styled(Button)`
 
 const DataMgmtView = () => {
   const { isOpen, onOpen, onClose } = useGlobalDrawer("data");
-  const {
-    preferredUnit,
-    imperialPrecision,
-    setPreferredUnit,
-    setImperialPrecision,
-    reset,
-    applySampleData,
-  } = useData();
+  const { preferredUnit, setPreferredUnit, reset, applySampleData } = useData();
   const { isDeveloper, exitDeveloperMode } = useUiData();
 
   return (
@@ -78,22 +71,6 @@ const DataMgmtView = () => {
               </Stack>
             </RadioGroup>
           </Box>
-          {preferredUnit === "inch" && (
-            <Box padding="1em">
-              <RadioGroup
-                onChange={(precision) =>
-                  setImperialPrecision(Number.parseInt(precision) as ImperialPrecision)
-                }
-                value={imperialPrecision.toFixed(0)}
-              >
-                <Stack direction="row">
-                  <Radio value="4">Nearest 1/4</Radio>
-                  <Radio value="8">Nearest 1/8</Radio>
-                  <Radio value="16">Nearest 1/16</Radio>
-                </Stack>
-              </RadioGroup>
-            </Box>
-          )}
           <PopoverHeader>
             <Heading as="h2" size="md">
               Data

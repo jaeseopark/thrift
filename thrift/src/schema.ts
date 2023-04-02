@@ -2,8 +2,6 @@ export const SCHEMA_VERSION = "1";
 
 export type Unit = "inch" | "foot" | "mm" | "cm" | "m";
 
-export type ImperialPrecision = 4 | 8 | 16;
-
 export type Measurement = {
   unit: Unit;
   value: number;
@@ -38,5 +36,4 @@ export type State = {
   catalog: AbstractMaterial[];
   inventory: PhysicalMaterial[];
   preferredUnit: Unit;
-  imperialPrecision: ImperialPrecision;
 };

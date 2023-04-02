@@ -44,7 +44,7 @@ const Row = ({
   onChange?: (material: MaterialRequirement) => void;
   onAdd?: (material: MaterialRequirement) => void;
 }) => {
-  const { catalog, catalogAsDict, preferredUnit, imperialPrecision } = useData();
+  const { catalog, catalogAsDict, preferredUnit } = useData();
   const [abstractMaterial, setAbstractMaterial] = useState<AbstractMaterial | undefined>(
     catalogAsDict[requirement?.abstractMaterialId || ""]
   );

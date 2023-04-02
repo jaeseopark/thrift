@@ -1,6 +1,6 @@
 import Fraction from "fraction.js";
 
-import { AbstractMaterial, ImperialPrecision, Measurement, Unit } from "./schema";
+import { AbstractMaterial, Measurement, Unit } from "./schema";
 
 export const getRandomValue = (len: number = 36) => {
   var arr = new Uint8Array((len || 40) / 2);
