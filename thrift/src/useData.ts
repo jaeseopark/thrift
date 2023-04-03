@@ -1,5 +1,6 @@
-import { Dispatch, createContext, useContext, useEffect, useReducer } from "react";
-import InventoryList from "./ProjectList";
+import { Dispatch, createContext, useContext, useEffect, useReducer, useCallback } from "react";
+
+import { debounce } from "debounce";
 
 import {
   AbstractMaterial,
@@ -174,8 +175,12 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
 
 export const useData = () => {
   const { state, dispatch } = useContext(ThirftDataContext);
+  const saveToLocalStorage = useCallback(debounce(() => localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)), 500), [state]);
 
-  useEffect(() => localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)), [state]);
+  useEffect(() => {
+    saveToLocalStorage();
+    return () => saveToLocalStorage.clear();
+  }, [state]);
 
   return {
     ...state,
