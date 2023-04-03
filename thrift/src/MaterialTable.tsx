@@ -154,7 +154,7 @@ export const Row = ({
               isReadOnly={readonly}
               onChange={(e) => setShouldMaintainGrainDirection(e.target.checked)}
             >
-              Maintain Grain Direction
+              Grain Direction Matters
             </Checkbox>
           )}
         </Flex>
