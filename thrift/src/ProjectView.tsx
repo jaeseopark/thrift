@@ -18,8 +18,6 @@ import { Project } from "./schema";
 import { useData } from "./useData";
 import { useUiData } from "./useUiData";
 
-import "./App.scss";
-
 const ProjectGallery = ({ urls }: { urls: string[] }) => {
   const InnerContent = () => {
     if (urls.length === 0) {
