@@ -1,4 +1,4 @@
-import { Dispatch, createContext, useContext, useEffect, useReducer, useCallback } from "react";
+import { Dispatch, createContext, useCallback, useContext, useEffect, useReducer } from "react";
 
 import { debounce } from "debounce";
 
@@ -18,36 +18,38 @@ const LOCAL_STORAGE_KEY = `thrift-v${SCHEMA_VERSION}`;
 
 type ThriftDataOperation =
   | {
-    type: "ADD_PROJECT";
-  }
+      type: "ADD_PROJECT";
+    }
   | {
-    type: "EDIT_PROJECT";
-    payload: ProjectHeaderProps;
-  }
+      type: "EDIT_PROJECT";
+      payload: ProjectHeaderProps;
+    }
   | {
-    type: "ADD_MATERIAL_TO_PROJECT";
-    payload: {
-      projectId: string;
-      requirement: MaterialRequirement;
-    };
-  } | {
-    type: "ADD_MATERIAL_TO_INVENTORY",
-    payload: PhysicalMaterial
-  }
+      type: "ADD_MATERIAL_TO_PROJECT";
+      payload: {
+        projectId: string;
+        requirement: MaterialRequirement;
+      };
+    }
   | {
-    type: "UPDATE_MATERIAL_IN_PROJECT";
-    payload: {
-      projectId: string;
-      requirement: MaterialRequirement;
-    };
-  } | {
-    type: "UPDATE_MATERIAL_IN_INVENTORY",
-    payload: PhysicalMaterial
-  }
+      type: "ADD_MATERIAL_TO_INVENTORY";
+      payload: PhysicalMaterial;
+    }
   | {
-    type: "SET_PREFERRED_UNIT";
-    payload: Unit;
-  }
+      type: "UPDATE_MATERIAL_IN_PROJECT";
+      payload: {
+        projectId: string;
+        requirement: MaterialRequirement;
+      };
+    }
+  | {
+      type: "UPDATE_MATERIAL_IN_INVENTORY";
+      payload: PhysicalMaterial;
+    }
+  | {
+      type: "SET_PREFERRED_UNIT";
+      payload: Unit;
+    }
   | { type: "SET_STATE"; payload: State };
 
 const blank: State = {
@@ -121,8 +123,8 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
     case "ADD_MATERIAL_TO_INVENTORY":
       return {
         ...state,
-        inventory: [...state.inventory, operation.payload]
-      }
+        inventory: [...state.inventory, operation.payload],
+      };
     case "UPDATE_MATERIAL_IN_PROJECT": {
       const projects = state.projects.reduce((accProjects, nextProject) => {
         let elementToPush = nextProject;
@@ -157,9 +159,10 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
           if (toPush.id === operation.payload.id) {
             toPush = operation.payload;
           }
+          acc.push(toPush);
           return acc;
-        }, [] as PhysicalMaterial[])
-      }
+        }, [] as PhysicalMaterial[]),
+      };
     case "SET_PREFERRED_UNIT":
       return {
         ...state,
@@ -175,7 +178,10 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
 
 export const useData = () => {
   const { state, dispatch } = useContext(ThirftDataContext);
-  const saveToLocalStorage = useCallback(debounce(() => localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)), 500), [state]);
+  const saveToLocalStorage = useCallback(
+    debounce(() => localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state)), 500),
+    [state]
+  );
 
   useEffect(() => {
     saveToLocalStorage();
@@ -193,13 +199,15 @@ export const useData = () => {
       dispatch!({ type: "EDIT_PROJECT", payload: projectHeaderProps }),
     addMaterialToProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
       dispatch!({ type: "ADD_MATERIAL_TO_PROJECT", payload }),
-    addMaterialToInventory: (material: PhysicalMaterial) => dispatch!({ type: "ADD_MATERIAL_TO_INVENTORY", payload: material }),
+    addMaterialToInventory: (material: PhysicalMaterial) =>
+      dispatch!({ type: "ADD_MATERIAL_TO_INVENTORY", payload: material }),
     updateMaterialInProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
       dispatch!({ type: "UPDATE_MATERIAL_IN_PROJECT", payload }),
-    updateMaterialInInventory: (material: PhysicalMaterial) => dispatch!({ type: "UPDATE_MATERIAL_IN_INVENTORY", payload: material }),
+    updateMaterialInInventory: (material: PhysicalMaterial) =>
+      dispatch!({ type: "UPDATE_MATERIAL_IN_INVENTORY", payload: material }),
     setPreferredUnit: (unit: Unit) => dispatch!({ type: "SET_PREFERRED_UNIT", payload: unit }),
     reset: () => dispatch!({ type: "SET_STATE", payload: blank }),
-    applySampleData: () => { },
+    applySampleData: () => {},
   };
 };
 

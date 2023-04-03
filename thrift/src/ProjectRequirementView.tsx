@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { MdAdd, MdOutlineDone } from "react-icons/md";
+import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button, Checkbox, Flex, Input, Select, Spacer, Tbody, Td, Tr } from "@chakra-ui/react";
-
 import { debounce } from "debounce";
+import { MdAdd, MdOutlineDone } from "react-icons/md";
 
 import MaterialTableShell from "./MaterialTableShell";
 import { AbstractMaterial, MaterialRequirement, PhysicalMaterial } from "./schema";
@@ -17,11 +16,13 @@ export const Row = ({
   onChange,
   onAdd,
   allowGrainDirectionSelection,
+  readonly,
 }: {
   requirement?: MaterialRequirement;
   onChange?: (material: MaterialRequirement) => void;
   onAdd?: (material: MaterialRequirement) => void;
   allowGrainDirectionSelection?: boolean;
+  readonly?: boolean;
 }) => {
   const { catalog, catalogAsDict, preferredUnit } = useData();
   const [abstractMaterial, setAbstractMaterial] = useState<AbstractMaterial | undefined>(
@@ -44,6 +45,9 @@ export const Row = ({
   const [showUpdateIndicator, setShowUpdateIndicator] = useState(false);
 
   const isReadyToSave = useMemo(() => {
+    if (readonly) {
+      return false;
+    }
     if (abstractMaterial && thickness && width && length && quantity > 0) {
       if (!requirement) {
         // this is the 'new row' scenario.
@@ -110,19 +114,33 @@ export const Row = ({
     setShouldMaintainGrainDirection(false);
   };
 
+  const tryAdd = () => {
+    if (isReadyToSave && onAdd) {
+      onAdd(getNewRequirement()!);
+      clearFields();
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      tryAdd();
+    }
+  };
+
   return (
     <Tr>
       <Td>
         <Flex flexDir="row">
           <Select
             maxWidth="275px"
-            value={abstractMaterial?.id}
+            value={abstractMaterial?.id || ""}
+            isDisabled={readonly}
             onChange={(e) => {
               const [absMat] = catalog.filter((absMat) => absMat.id === e.target.value);
               setAbstractMaterial(absMat);
             }}
           >
-            <option />
+            {onAdd && <option />}
             {catalog.map((absMat) => (
               <option key={absMat.id} value={absMat.id}>
                 {absMat.name}
@@ -133,6 +151,7 @@ export const Row = ({
           {allowGrainDirectionSelection && abstractMaterial?.hasGrainDirection && (
             <Checkbox
               isChecked={shouldMaintainGrainDirection}
+              isReadOnly={readonly}
               onChange={(e) => setShouldMaintainGrainDirection(e.target.checked)}
             >
               Maintain Grain Direction
@@ -147,6 +166,8 @@ export const Row = ({
           placeholder='Example: 3/4" or 19 mm'
           isInvalid={!thickness}
           errorBorderColor={editThickness && !thickness ? "red.500" : "gray.400"}
+          onKeyDown={handleKeyDown}
+          isReadOnly={readonly}
           onChange={(e) => {
             setEditThickness(e.target.value);
             setThickness(toPreferredMeasurement(e.target.value));
@@ -165,6 +186,8 @@ export const Row = ({
           placeholder='Example: 9 3/4" or 248 mm'
           isInvalid={!width}
           errorBorderColor={editWidth && !width ? "red.500" : "gray.400"}
+          onKeyDown={handleKeyDown}
+          isReadOnly={readonly}
           onChange={(e) => {
             setEditWidth(e.target.value);
             setWidth(toPreferredMeasurement(e.target.value));
@@ -183,6 +206,8 @@ export const Row = ({
           placeholder='Example: 64" or 1626 mm'
           isInvalid={!length}
           errorBorderColor={editLength && !length ? "red.500" : "gray.400"}
+          onKeyDown={handleKeyDown}
+          isReadOnly={readonly}
           onChange={(e) => {
             setEditLength(e.target.value);
             setLength(toPreferredMeasurement(e.target.value));
@@ -203,6 +228,8 @@ export const Row = ({
           step={1}
           isInvalid={quantity < 1}
           errorBorderColor="red.500"
+          onKeyDown={handleKeyDown}
+          isReadOnly={readonly}
           onChange={(e) => setQuantity(e.target.valueAsNumber)}
         />
       </Td>
@@ -210,10 +237,7 @@ export const Row = ({
         {onAdd && (
           <Button
             leftIcon={<MdAdd />}
-            onClick={() => {
-              onAdd(getNewRequirement()!);
-              clearFields();
-            }}
+            onClick={tryAdd}
             isDisabled={!isReadyToSave}
             colorScheme="teal"
           >
@@ -229,15 +253,18 @@ export const Row = ({
 const ExistingRow = ({
   projectId,
   requirement,
+  readonly,
 }: {
   projectId: string;
   requirement: MaterialRequirement;
+  readonly?: boolean;
 }) => {
   const { updateMaterialInProject } = useData();
   return (
     <Row
       allowGrainDirectionSelection={true}
       requirement={requirement}
+      readonly={readonly}
       onChange={(requirement) => {
         updateMaterialInProject({ projectId, requirement });
       }}
@@ -257,9 +284,16 @@ const NewRow = ({ projectId }: { projectId: string }) => {
   );
 };
 
-export const ReadOnlyMaterialView = ({ requirements }: { requirements: PhysicalMaterial[] }) => {
-  // TODO
-  return <div>ReadOnlyMaterialView</div>;
+export const ReadOnlyMaterialView = ({ requirements }: { requirements: MaterialRequirement[] }) => {
+  return (
+    <MaterialTableShell>
+      <Tbody>
+        {requirements.map((requirement) => (
+          <ExistingRow key={requirement.id} projectId="" requirement={requirement} readonly />
+        ))}
+      </Tbody>
+    </MaterialTableShell>
+  );
 };
 
 export const EditableMaterialView = ({

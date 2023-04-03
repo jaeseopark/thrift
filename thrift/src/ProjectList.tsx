@@ -1,5 +1,4 @@
-import { Button, Flex, Heading, Spacer } from "@chakra-ui/react";
-
+import { Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import cls from "classnames";
 
 import { useData } from "./useData";
@@ -32,8 +31,8 @@ const InventoryList = () => {
   };
 
   return (
-    <div className="project-list">
-      <Flex>
+    <VStack className="project-list" spacing=".5em">
+      <Flex width="100%">
         <Heading as="h2" size="md">
           Projects
         </Heading>
@@ -56,7 +55,7 @@ const InventoryList = () => {
         </Heading>
       ))}
       {!projects.length && <Spacer minHeight="1em" />}
-    </div>
+    </VStack>
   );
 };
 

@@ -1,5 +1,3 @@
-import { MdInventory } from "react-icons/md";
-
 import {
   Box,
   Drawer,
@@ -11,6 +9,7 @@ import {
   Icon,
   Tbody,
 } from "@chakra-ui/react";
+import { MdInventory } from "react-icons/md";
 
 import MaterialTableShell from "./MaterialTableShell";
 import { Row } from "./ProjectRequirementView";

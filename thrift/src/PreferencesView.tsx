@@ -1,9 +1,3 @@
-import { BsFillGearFill } from "react-icons/bs";
-import { GrDocumentTest } from "react-icons/gr";
-import { ImDownload3 } from "react-icons/im";
-import { MdOutlineRestore } from "react-icons/md";
-import { RiDeleteBin5Line } from "react-icons/ri";
-
 import {
   Box,
   Button,
@@ -20,7 +14,11 @@ import {
   Stack,
   VStack,
 } from "@chakra-ui/react";
-
+import { BsFillGearFill } from "react-icons/bs";
+import { GrDocumentTest } from "react-icons/gr";
+import { ImDownload3 } from "react-icons/im";
+import { MdOutlineRestore } from "react-icons/md";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import styled from "styled-components";
 
 import { Unit } from "./schema";

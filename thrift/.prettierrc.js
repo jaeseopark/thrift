@@ -3,9 +3,9 @@ module.exports = {
   tabWidth: 2,
   singleQuote: false,
   importOrder: [
-    "^react",
+    "^react$",
     "^react-dom.*",
-    "chakra-ui",
+    "^chakra-ui",
     "^(?![.]).*", // other 3rd party libraries
     "^[.].*(?<!css)$", // local dependencies (except css)
     "^[.].*css$", // local CSS files
