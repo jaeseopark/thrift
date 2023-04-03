@@ -1,0 +1,56 @@
+.App-header {
+  background-color: #282c34;
+  height: 3.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3em 0;
+}
+
+.project-list {
+  padding: 1em;
+  width: 300px;
+  min-width: 10vw;
+
+  .submenu {
+    margin-left: 1em;
+    min-height: 1.5em;
+    width: 100%;
+    padding-left: 0.5em;
+    padding-top: 0.2em;
+  }
+
+  .highlighted {
+    background-color: var(--chakra-colors-teal-500);
+    color: white;
+    border-radius: 0.25em;
+  }
+}
+
+.inventory-view {
+  width: 30vw;
+
+  &.collapsed {
+    width: 30px;
+  }
+}
+
+.project-view {
+  width: 100%;
+  height: 100%;
+
+  .project-header-and-gallery {
+    width: 100%;
+    height: 30vh;
+    overflow: hidden;
+
+    .project-header {
+      width: 30vw;
+    }
+
+    .project-image-gallery {
+      width: 20vw;
+    }
+  }
+}

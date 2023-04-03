@@ -1,0 +1,13 @@
+version: "3"
+services:
+  thrift-dev:
+    image: thrift:latest
+    working_dir: /app
+    command: yarn start
+    volumes:
+      - ./thrift:/app
+    ports:
+      - 29357:3000
+    environment:
+      TZ: ${TIMEZONE}
+      # NODE_OPTIONS: --openssl-legacy-provider
