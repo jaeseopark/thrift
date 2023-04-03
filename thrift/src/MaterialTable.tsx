@@ -1,10 +1,11 @@
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { ReactNode } from "react";
 
-import { Button, Checkbox, Flex, Input, Select, Spacer, Td, Tr } from "@chakra-ui/react";
+import { Button, Checkbox, Flex, Icon, Input, Select, Spacer, Td, Tr } from "@chakra-ui/react";
 import { Table, Th, Thead } from "@chakra-ui/react";
+import { Tooltip } from "@chakra-ui/react";
 import { debounce } from "debounce";
-import { MdAdd, MdOutlineDone } from "react-icons/md";
+import { MdAdd, MdInfoOutline, MdOutlineDone } from "react-icons/md";
 
 import { AbstractMaterial, CutlistItem } from "./schema";
 import { useData } from "./useData";
@@ -162,7 +163,6 @@ export const Row = ({
         <Input
           type="text"
           value={editThickness}
-          placeholder='Example: 3/4" or 19 mm'
           isInvalid={!thickness}
           errorBorderColor={editThickness && !thickness ? "red.500" : "gray.400"}
           onKeyDown={handleKeyDown}
@@ -182,7 +182,6 @@ export const Row = ({
         <Input
           type="text"
           value={editWidth}
-          placeholder='Example: 9 3/4" or 248 mm'
           isInvalid={!width}
           errorBorderColor={editWidth && !width ? "red.500" : "gray.400"}
           onKeyDown={handleKeyDown}
@@ -202,7 +201,6 @@ export const Row = ({
         <Input
           type="text"
           value={editLength}
-          placeholder='Example: 64" or 1626 mm'
           isInvalid={!length}
           errorBorderColor={editLength && !length ? "red.500" : "gray.400"}
           onKeyDown={handleKeyDown}
@@ -254,10 +252,31 @@ export const MaterialTableShell = ({ children }: { children: ReactNode }) => (
     <Thead>
       <Tr>
         <Th width="550px">Material</Th>
-        <Th width="240px">Thickness</Th>
-        <Th width="240px">Width</Th>
-        <Th width="240px">Length</Th>
-        <Th width="240px">Quantity</Th>
+        <Th width="200px">
+          Thickness
+          <Tooltip label='Example: 3/4" or 19 mm' fontSize="md">
+            <span>
+              <Icon as={MdInfoOutline} />
+            </span>
+          </Tooltip>
+        </Th>
+        <Th width="200px">
+          Width
+          <Tooltip label='Example: 5 1/2" or 140 mm' fontSize="md">
+            <span>
+              <Icon as={MdInfoOutline} />
+            </span>
+          </Tooltip>
+        </Th>
+        <Th width="200px">
+          Length
+          <Tooltip label='Example: 36" or 914 mm' fontSize="md">
+            <span>
+              <Icon as={MdInfoOutline} />
+            </span>
+          </Tooltip>
+        </Th>
+        <Th width="200px">Quantity</Th>
         <Th />
       </Tr>
     </Thead>
