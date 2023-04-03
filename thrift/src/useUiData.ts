@@ -1,4 +1,5 @@
 import { Dispatch, createContext, useContext, useReducer } from "react";
+import { Project } from "./schema";
 
 const LOCAL_STORAGE_DEV_ROLE_KEY = "thrift-developer";
 
@@ -10,17 +11,17 @@ type State = {
 
 type UiDataOperation =
   | {
-      type: "SET_SELECTED_PROJECT_INDICES";
-      payload: number[];
-    }
+    type: "SET_SELECTED_PROJECT_INDICES";
+    payload: number[];
+  }
   | {
-      type: "SET_PROJECT_MULTI_SELECT_PIVOT_INDEX";
-      payload: number;
-    }
+    type: "SET_PROJECT_MULTI_SELECT_PIVOT_INDEX";
+    payload: number;
+  }
   | {
-      type: "SET_ACTIVE_DRAWER";
-      payload: string;
-    }
+    type: "SET_ACTIVE_DRAWER";
+    payload: string;
+  }
   | { type: "CLOSE_DRAWER" };
 
 const initialState: State = {
@@ -77,6 +78,7 @@ export const useUiData = () => {
         type: "SET_PROJECT_MULTI_SELECT_PIVOT_INDEX",
         payload: index,
       }),
+    getSelectedProjects: (allProjects: Project[]) => allProjects.filter((_, i) => state.selectedProjectIndices.includes(i))
   };
 };
 

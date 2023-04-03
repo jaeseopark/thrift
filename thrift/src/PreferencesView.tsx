@@ -12,6 +12,7 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Tooltip,
   VStack,
 } from "@chakra-ui/react";
 import { BsFillGearFill } from "react-icons/bs";
@@ -51,7 +52,13 @@ const DataMgmtView = () => {
             </Heading>
           </PopoverHeader>
           <Box className="preferences-form" padding="1em">
-            Preferred Unit:
+            <Tooltip
+              hasArrow
+              label="The selected option will be used if you omit the unit in an input"
+              fontSize="md"
+            >
+              <span>Preferred Unit:</span>
+            </Tooltip>
             <RadioGroup onChange={(unit) => setPreferredUnit(unit as Unit)} value={preferredUnit}>
               <Stack direction="row">
                 <Radio value="inch">Inch (")</Radio>

@@ -26,7 +26,7 @@ export type ProjectHeaderProps = {
   id: string;
   name: string;
   description: string;
-  imageUrls: string; // line-separated image URLs
+  imageUrls: string[];
 };
 
 export type Project = ProjectHeaderProps & { cutlist: CutlistItem[] };

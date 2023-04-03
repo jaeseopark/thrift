@@ -1,11 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import {
   Box,
   Button,
+  FocusLock,
   HStack,
   Heading,
   ListItem,
+  Popover,
+  PopoverArrow,
+  PopoverContent,
+  PopoverFooter,
+  PopoverTrigger,
   Textarea,
   UnorderedList,
   VStack,
@@ -16,30 +22,88 @@ import ResponsiveGallery from "react-responsive-gallery";
 import { EditableMaterialView, ReadOnlyMaterialView } from "./CutlistView";
 import { Project } from "./schema";
 import { useData } from "./useData";
+import { useGlobalDrawer } from "./useDrawer";
 import { useUiData } from "./useUiData";
 
-const ProjectGallery = ({ urls }: { urls: string[] }) => {
-  const InnerContent = () => {
-    if (urls.length === 0) {
-      return <Heading>No Images</Heading>;
-    }
-    return <ResponsiveGallery images={urls.map((url) => ({ src: url }))} useLightBox />;
-  };
+const ImageUrlEditTrigger = ({
+  urls,
+  onChange,
+}: {
+  urls: string[];
+  onChange: (urls: string[]) => void;
+}) => {
+  const { isOpen, onOpen, onClose } = useGlobalDrawer("edit-project-images");
+
+  return (
+    <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement="right">
+      <PopoverTrigger>
+        <Button leftIcon={<AiFillEdit />} size="sm" paddingLeft="1.4em" />
+      </PopoverTrigger>
+      <PopoverContent p={5}>
+        {isOpen && (
+          <ImageUrlForm
+            urls={urls}
+            onChange={(imageUrls) => {
+              onChange(imageUrls);
+              onClose();
+            }}
+          />
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+const ImageUrlForm = ({
+  urls,
+  onChange,
+}: {
+  urls: string[];
+  onChange: (urls: string[]) => void;
+}) => {
+  const [newUrls, setNewUrls] = useState(urls.join("\n"));
+
+  return (
+    <FocusLock persistentFocus={false}>
+      <PopoverArrow />
+      <Textarea value={newUrls} onChange={({ target: { value } }) => setNewUrls(value)} />
+      <PopoverFooter>
+        <Button onClick={() => onChange(newUrls.split("\n").filter((url) => url))}>Save</Button>
+      </PopoverFooter>
+    </FocusLock>
+  );
+};
+
+const ProjectGallery = ({ projects }: { projects: Project[] }) => {
+  const { editProjectHeaderProps } = useData();
+
+  const urls = projects.flatMap((p) => p.imageUrls).filter((url) => url);
 
   return (
     <div className="project-image-gallery">
-      <InnerContent />
+      {projects.length === 1 && (
+        <ImageUrlEditTrigger
+          urls={urls}
+          onChange={(imageUrls) => {
+            editProjectHeaderProps({
+              ...projects[0],
+              imageUrls,
+            });
+          }}
+        />
+      )}
+      <ResponsiveGallery images={urls.map((url) => ({ src: url }))} useLightBox />
     </div>
   );
 };
 
 const ProjectView = () => {
   const { projects } = useData();
-  const { selectedProjectIndices } = useUiData();
+  const { getSelectedProjects } = useUiData();
 
-  const selectedProjects: Project[] = useMemo(
-    () => projects.filter((_, i) => selectedProjectIndices.includes(i)),
-    [selectedProjectIndices, projects]
+  const selectedProjects = useMemo(
+    () => getSelectedProjects(projects),
+    [getSelectedProjects, projects]
   );
 
   if (selectedProjects.length === 0) {
@@ -69,9 +133,6 @@ const ProjectView = () => {
       <VStack className="project-header" spacing="1em">
         <Textarea value={project.name} width="100%" />
         <Textarea value={project.description} width="100%" />
-        <Heading as="h3" size="md" width="100%">
-          Images <Button leftIcon={<AiFillEdit />} size="sm" paddingLeft="1.4em" />
-        </Heading>
       </VStack>
     );
   };
@@ -97,21 +158,10 @@ const ProjectView = () => {
   const ProjectHeader = getProjectHeader();
   const MaterialView = getMaterialView();
 
-  // const urls = selectedProjects
-  //   .map((p) => p.imageUrls)
-  //   .join("\n")
-  //   .split("\n");
-  const urls = [
-    "https://homedesignlover.com/wp-content/uploads/2015/09/1-cinema.jpg",
-    "https://capablegroupinc.ca/wp-content/uploads/2021/03/5D3_0099-HDR.jpg",
-    "https://farmfoodfamily.com/wp-content/uploads/2021/12/1-basement-home-theater-ideas.jpg",
-    "https://cdn-bdilb.nitrocdn.com/HLQpTIIuNEYamdXTprwtltrexJwWJIMc/assets/images/optimized/rev-daba379/wp-content/uploads/2020/05/IMG_1877.jpeg",
-  ];
-
   return (
     <VStack className="project-view" padding="1em">
       <HStack className="project-header-and-gallery" spacing="1em">
-        <ProjectGallery urls={urls} />
+        <ProjectGallery projects={selectedProjects} />
         <ProjectHeader />
       </HStack>
       <MaterialView />

@@ -18,38 +18,38 @@ const LOCAL_STORAGE_KEY = `thrift-v${SCHEMA_VERSION}`;
 
 type ThriftDataOperation =
   | {
-      type: "ADD_PROJECT";
-    }
+    type: "ADD_PROJECT";
+  }
   | {
-      type: "EDIT_PROJECT";
-      payload: ProjectHeaderProps;
-    }
+    type: "EDIT_PROJECT";
+    payload: ProjectHeaderProps;
+  }
   | {
-      type: "ADD_MATERIAL_TO_PROJECT";
-      payload: {
-        projectId: string;
-        cutlistItem: CutlistItem;
-      };
-    }
+    type: "ADD_MATERIAL_TO_PROJECT";
+    payload: {
+      projectId: string;
+      cutlistItem: CutlistItem;
+    };
+  }
   | {
-      type: "ADD_MATERIAL_TO_INVENTORY";
-      payload: PhysicalMaterial;
-    }
+    type: "ADD_MATERIAL_TO_INVENTORY";
+    payload: PhysicalMaterial;
+  }
   | {
-      type: "UPDATE_MATERIAL_IN_PROJECT";
-      payload: {
-        projectId: string;
-        cutlistItem: CutlistItem;
-      };
-    }
+    type: "UPDATE_MATERIAL_IN_PROJECT";
+    payload: {
+      projectId: string;
+      cutlistItem: CutlistItem;
+    };
+  }
   | {
-      type: "UPDATE_MATERIAL_IN_INVENTORY";
-      payload: PhysicalMaterial;
-    }
+    type: "UPDATE_MATERIAL_IN_INVENTORY";
+    payload: PhysicalMaterial;
+  }
   | {
-      type: "SET_PREFERRED_UNIT";
-      payload: Unit;
-    }
+    type: "SET_PREFERRED_UNIT";
+    payload: Unit;
+  }
   | { type: "SET_STATE"; payload: State };
 
 const blank: State = {
@@ -82,7 +82,7 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
             id: getRandomValue(),
             name: getNewProjectName(state.projects.map((project) => project.name)),
             description: "",
-            imageUrls: "",
+            imageUrls: [],
             cutlist: [],
           },
         ],
@@ -206,7 +206,9 @@ export const useData = () => {
       dispatch!({ type: "UPDATE_MATERIAL_IN_INVENTORY", payload: material }),
     setPreferredUnit: (unit: Unit) => dispatch!({ type: "SET_PREFERRED_UNIT", payload: unit }),
     reset: () => dispatch!({ type: "SET_STATE", payload: blank }),
-    applySampleData: () => {},
+    applySampleData: () => { 
+      // TODO
+    },
   };
 };
 
