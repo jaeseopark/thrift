@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import Select from "react-dropdown-select";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MdAdd, MdOutlineDone } from "react-icons/md";
 
-import { Button, Input, Tbody, Td, Tr } from "@chakra-ui/react";
+import { Button, Checkbox, Flex, Input, Select, Spacer, Tbody, Td, Tr } from "@chakra-ui/react";
 
 import { debounce } from "debounce";
 
@@ -17,10 +16,12 @@ export const Row = ({
   requirement,
   onChange,
   onAdd,
+  allowGrainDirectionSelection,
 }: {
   requirement?: MaterialRequirement;
   onChange?: (material: MaterialRequirement) => void;
   onAdd?: (material: MaterialRequirement) => void;
+  allowGrainDirectionSelection?: boolean;
 }) => {
   const { catalog, catalogAsDict, preferredUnit } = useData();
   const [abstractMaterial, setAbstractMaterial] = useState<AbstractMaterial | undefined>(
@@ -32,6 +33,9 @@ export const Row = ({
   const [width, setWidth] = useState(requirement?.width);
   const [length, setLength] = useState(requirement?.length);
   const [quantity, setQuantity] = useState(requirement?.quantity || 1);
+  const [shouldMaintainGrainDirection, setShouldMaintainGrainDirection] = useState(
+    !!requirement?.shouldMaintainGrainDirection
+  );
 
   const [editThickness, setEditThickness] = useState(thickness ? toHumanFormat(thickness) : "");
   const [editWidth, setEditWidth] = useState(width ? toHumanFormat(width) : "");
@@ -52,22 +56,31 @@ export const Row = ({
         !equals(thickness, requirement.thickness) ||
         !equals(width, requirement.width) ||
         !equals(length, requirement.length) ||
-        quantity !== requirement.quantity
+        quantity !== requirement.quantity ||
+        shouldMaintainGrainDirection !== requirement.shouldMaintainGrainDirection
       );
     }
     return false;
-  }, [abstractMaterial, thickness, width, length, quantity, requirement]);
+  }, [
+    abstractMaterial,
+    thickness,
+    width,
+    length,
+    quantity,
+    shouldMaintainGrainDirection,
+    requirement,
+  ]);
 
-  useEffect(() => {
-    const save = debounce(() => {
+  const save = useCallback(
+    debounce(() => {
       onChange!(getNewRequirement()!);
       setShowUpdateIndicator(true);
-      setTimeout(() => {
-        // hide the indicator after 2000ms.
-        setShowUpdateIndicator(false);
-      }, 2000);
-    }, 1000);
+      setTimeout(() => setShowUpdateIndicator(false), 2000);
+    }, 500),
+    [isReadyToSave]
+  );
 
+  useEffect(() => {
     if (onChange && isReadyToSave) {
       save();
     }
@@ -78,7 +91,8 @@ export const Row = ({
       return {
         id: requirement?.id || getRandomValue(),
         abstractMaterialId: abstractMaterial!.id,
-        shouldMaintainGrainDirection: false,
+        shouldMaintainGrainDirection:
+          abstractMaterial!.hasGrainDirection && shouldMaintainGrainDirection,
         thickness: thickness!,
         width: width!,
         length: length!,
@@ -93,19 +107,38 @@ export const Row = ({
     setEditWidth("");
     setEditLength("");
     setQuantity(1);
+    setShouldMaintainGrainDirection(false);
   };
 
   return (
     <Tr>
       <Td>
-        <Select
-          options={catalog}
-          labelField="name"
-          valueField="id"
-          searchBy="name"
-          values={abstractMaterial ? [abstractMaterial] : []}
-          onChange={([value]) => setAbstractMaterial(value)}
-        />
+        <Flex flexDir="row">
+          <Select
+            maxWidth="275px"
+            value={abstractMaterial?.id}
+            onChange={(e) => {
+              const [absMat] = catalog.filter((absMat) => absMat.id === e.target.value);
+              setAbstractMaterial(absMat);
+            }}
+          >
+            <option />
+            {catalog.map((absMat) => (
+              <option key={absMat.id} value={absMat.id}>
+                {absMat.name}
+              </option>
+            ))}
+          </Select>
+          <Spacer />
+          {allowGrainDirectionSelection && abstractMaterial?.hasGrainDirection && (
+            <Checkbox
+              isChecked={shouldMaintainGrainDirection}
+              onChange={(e) => setShouldMaintainGrainDirection(e.target.checked)}
+            >
+              Maintain Grain Direction
+            </Checkbox>
+          )}
+        </Flex>
       </Td>
       <Td>
         <Input
@@ -203,6 +236,7 @@ const ExistingRow = ({
   const { updateMaterialInProject } = useData();
   return (
     <Row
+      allowGrainDirectionSelection={true}
       requirement={requirement}
       onChange={(requirement) => {
         updateMaterialInProject({ projectId, requirement });
@@ -215,6 +249,7 @@ const NewRow = ({ projectId }: { projectId: string }) => {
   const { addMaterialToProject } = useData();
   return (
     <Row
+      allowGrainDirectionSelection={true}
       onAdd={(requirement) => {
         addMaterialToProject({ projectId, requirement });
       }}

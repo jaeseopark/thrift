@@ -6,11 +6,11 @@ const MaterialTableShell = ({ children }: { children: ReactNode }) => (
   <Table>
     <Thead>
       <Tr>
-        <Th>Material</Th>
-        <Th>Thickness</Th>
-        <Th>Width</Th>
-        <Th>Length</Th>
-        <Th>Quantity</Th>
+        <Th width="550px">Material</Th>
+        <Th width="240px">Thickness</Th>
+        <Th width="240px">Width</Th>
+        <Th width="240px">Length</Th>
+        <Th width="240px">Quantity</Th>
         <Th />
       </Tr>
     </Thead>
