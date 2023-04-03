@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { MdInventory } from "react-icons/md";
 
-import MaterialTableShell from "./MaterialTableShell";
-import { Row } from "./ProjectRequirementView";
+import { MaterialTableShell } from "./MaterialTable";
+import { Row } from "./MaterialTable";
 import { PhysicalMaterial } from "./schema";
 import { useData } from "./useData";
 import { useGlobalDrawer } from "./useDrawer";
@@ -21,7 +21,7 @@ const ExistingRow = ({ materialInHand }: { materialInHand: PhysicalMaterial }) =
   const { updateMaterialInInventory } = useData();
   return (
     <Row
-      requirement={{ ...materialInHand, shouldMaintainGrainDirection: false }}
+      cutlistItem={{ ...materialInHand, shouldMaintainGrainDirection: false }}
       onChange={(material) => {
         updateMaterialInInventory(material);
       }}

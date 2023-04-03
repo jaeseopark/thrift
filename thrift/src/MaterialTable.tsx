@@ -1,41 +1,40 @@
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode } from "react";
 
-import { Button, Checkbox, Flex, Input, Select, Spacer, Tbody, Td, Tr } from "@chakra-ui/react";
+import { Button, Checkbox, Flex, Input, Select, Spacer, Td, Tr } from "@chakra-ui/react";
+import { Table, Th, Thead } from "@chakra-ui/react";
 import { debounce } from "debounce";
 import { MdAdd, MdOutlineDone } from "react-icons/md";
 
-import MaterialTableShell from "./MaterialTableShell";
-import { AbstractMaterial, MaterialRequirement, PhysicalMaterial } from "./schema";
+import { AbstractMaterial, CutlistItem } from "./schema";
 import { useData } from "./useData";
 import { equals, getRandomValue, toHumanFormat, toMeasurement } from "./utils";
 
-import "./App.scss";
-
 export const Row = ({
-  requirement,
+  cutlistItem,
   onChange,
   onAdd,
   allowGrainDirectionSelection,
   readonly,
 }: {
-  requirement?: MaterialRequirement;
-  onChange?: (material: MaterialRequirement) => void;
-  onAdd?: (material: MaterialRequirement) => void;
+  cutlistItem?: CutlistItem;
+  onChange?: (material: CutlistItem) => void;
+  onAdd?: (material: CutlistItem) => void;
   allowGrainDirectionSelection?: boolean;
   readonly?: boolean;
 }) => {
   const { catalog, catalogAsDict, preferredUnit } = useData();
   const [abstractMaterial, setAbstractMaterial] = useState<AbstractMaterial | undefined>(
-    catalogAsDict[requirement?.abstractMaterialId || ""]
+    catalogAsDict[cutlistItem?.abstractMaterialId || ""]
   );
   const toPreferredMeasurement = (s: string) => toMeasurement(s, preferredUnit);
   // TODO: consider grain direction
-  const [thickness, setThickness] = useState(requirement?.thickness);
-  const [width, setWidth] = useState(requirement?.width);
-  const [length, setLength] = useState(requirement?.length);
-  const [quantity, setQuantity] = useState(requirement?.quantity || 1);
+  const [thickness, setThickness] = useState(cutlistItem?.thickness);
+  const [width, setWidth] = useState(cutlistItem?.width);
+  const [length, setLength] = useState(cutlistItem?.length);
+  const [quantity, setQuantity] = useState(cutlistItem?.quantity || 1);
   const [shouldMaintainGrainDirection, setShouldMaintainGrainDirection] = useState(
-    !!requirement?.shouldMaintainGrainDirection
+    !!cutlistItem?.shouldMaintainGrainDirection
   );
 
   const [editThickness, setEditThickness] = useState(thickness ? toHumanFormat(thickness) : "");
@@ -49,19 +48,19 @@ export const Row = ({
       return false;
     }
     if (abstractMaterial && thickness && width && length && quantity > 0) {
-      if (!requirement) {
+      if (!cutlistItem) {
         // this is the 'new row' scenario.
         return true;
       }
 
       // this is the 'existing row' scenario. ie. only ready to save if the values have changed.
       return (
-        abstractMaterial.id !== requirement.abstractMaterialId ||
-        !equals(thickness, requirement.thickness) ||
-        !equals(width, requirement.width) ||
-        !equals(length, requirement.length) ||
-        quantity !== requirement.quantity ||
-        shouldMaintainGrainDirection !== requirement.shouldMaintainGrainDirection
+        abstractMaterial.id !== cutlistItem.abstractMaterialId ||
+        !equals(thickness, cutlistItem.thickness) ||
+        !equals(width, cutlistItem.width) ||
+        !equals(length, cutlistItem.length) ||
+        quantity !== cutlistItem.quantity ||
+        shouldMaintainGrainDirection !== cutlistItem.shouldMaintainGrainDirection
       );
     }
     return false;
@@ -72,12 +71,12 @@ export const Row = ({
     length,
     quantity,
     shouldMaintainGrainDirection,
-    requirement,
+    cutlistItem,
   ]);
 
   const save = useCallback(
     debounce(() => {
-      onChange!(getNewRequirement()!);
+      onChange!(getNewCutlistItem()!);
       setShowUpdateIndicator(true);
       setTimeout(() => setShowUpdateIndicator(false), 2000);
     }, 500),
@@ -90,10 +89,10 @@ export const Row = ({
     }
   }, [isReadyToSave]);
 
-  const getNewRequirement = (): MaterialRequirement | undefined => {
+  const getNewCutlistItem = (): CutlistItem | undefined => {
     if (isReadyToSave) {
       return {
-        id: requirement?.id || getRandomValue(),
+        id: cutlistItem?.id || getRandomValue(),
         abstractMaterialId: abstractMaterial!.id,
         shouldMaintainGrainDirection:
           abstractMaterial!.hasGrainDirection && shouldMaintainGrainDirection,
@@ -116,7 +115,7 @@ export const Row = ({
 
   const tryAdd = () => {
     if (isReadyToSave && onAdd) {
-      onAdd(getNewRequirement()!);
+      onAdd(getNewCutlistItem()!);
       clearFields();
     }
   };
@@ -250,67 +249,18 @@ export const Row = ({
   );
 };
 
-const ExistingRow = ({
-  projectId,
-  requirement,
-  readonly,
-}: {
-  projectId: string;
-  requirement: MaterialRequirement;
-  readonly?: boolean;
-}) => {
-  const { updateMaterialInProject } = useData();
-  return (
-    <Row
-      allowGrainDirectionSelection={true}
-      requirement={requirement}
-      readonly={readonly}
-      onChange={(requirement) => {
-        updateMaterialInProject({ projectId, requirement });
-      }}
-    />
-  );
-};
-
-const NewRow = ({ projectId }: { projectId: string }) => {
-  const { addMaterialToProject } = useData();
-  return (
-    <Row
-      allowGrainDirectionSelection={true}
-      onAdd={(requirement) => {
-        addMaterialToProject({ projectId, requirement });
-      }}
-    />
-  );
-};
-
-export const ReadOnlyMaterialView = ({ requirements }: { requirements: MaterialRequirement[] }) => {
-  return (
-    <MaterialTableShell>
-      <Tbody>
-        {requirements.map((requirement) => (
-          <ExistingRow key={requirement.id} projectId="" requirement={requirement} readonly />
-        ))}
-      </Tbody>
-    </MaterialTableShell>
-  );
-};
-
-export const EditableMaterialView = ({
-  projectId,
-  requirements,
-}: {
-  projectId: string;
-  requirements: MaterialRequirement[];
-}) => {
-  return (
-    <MaterialTableShell>
-      <Tbody>
-        {requirements.map((requirement) => (
-          <ExistingRow key={requirement.id} projectId={projectId} requirement={requirement} />
-        ))}
-        <NewRow projectId={projectId} />
-      </Tbody>
-    </MaterialTableShell>
-  );
-};
+export const MaterialTableShell = ({ children }: { children: ReactNode }) => (
+  <Table>
+    <Thead>
+      <Tr>
+        <Th width="550px">Material</Th>
+        <Th width="240px">Thickness</Th>
+        <Th width="240px">Width</Th>
+        <Th width="240px">Length</Th>
+        <Th width="240px">Quantity</Th>
+        <Th />
+      </Tr>
+    </Thead>
+    {children}
+  </Table>
+);

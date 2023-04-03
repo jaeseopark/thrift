@@ -4,7 +4,7 @@ import { debounce } from "debounce";
 
 import {
   AbstractMaterial,
-  MaterialRequirement,
+  CutlistItem,
   PhysicalMaterial,
   Project,
   ProjectHeaderProps,
@@ -28,7 +28,7 @@ type ThriftDataOperation =
       type: "ADD_MATERIAL_TO_PROJECT";
       payload: {
         projectId: string;
-        requirement: MaterialRequirement;
+        cutlistItem: CutlistItem;
       };
     }
   | {
@@ -39,7 +39,7 @@ type ThriftDataOperation =
       type: "UPDATE_MATERIAL_IN_PROJECT";
       payload: {
         projectId: string;
-        requirement: MaterialRequirement;
+        cutlistItem: CutlistItem;
       };
     }
   | {
@@ -83,7 +83,7 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
             name: getNewProjectName(state.projects.map((project) => project.name)),
             description: "",
             imageUrls: "",
-            requirements: [],
+            cutlist: [],
           },
         ],
       };
@@ -108,7 +108,7 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
         if (next.id === operation.payload.projectId) {
           elementToPush = {
             ...elementToPush,
-            requirements: [...elementToPush.requirements, operation.payload.requirement],
+            cutlist: [...elementToPush.cutlist, operation.payload.cutlistItem],
           };
         }
         acc.push(elementToPush);
@@ -126,21 +126,20 @@ const reducer = (state: State, operation: ThriftDataOperation): State => {
         inventory: [...state.inventory, operation.payload],
       };
     case "UPDATE_MATERIAL_IN_PROJECT": {
+      const getNewCutlist = (project: Project) =>
+        project.cutlist.reduce((acc, next) => {
+          let toPush = next;
+          if (toPush.id === operation.payload.cutlistItem.id) {
+            toPush = operation.payload.cutlistItem;
+          }
+          acc.push(toPush);
+          return acc;
+        }, [] as CutlistItem[]);
+
       const projects = state.projects.reduce((accProjects, nextProject) => {
         let elementToPush = nextProject;
         if (nextProject.id === operation.payload.projectId) {
-          const requirements = nextProject.requirements.reduce(
-            (accRequirements, nextRequirements) => {
-              let requirementToPush = nextRequirements;
-              if (requirementToPush.id === operation.payload.requirement.id) {
-                requirementToPush = operation.payload.requirement;
-              }
-              accRequirements.push(requirementToPush);
-              return accRequirements;
-            },
-            [] as MaterialRequirement[]
-          );
-          elementToPush = { ...elementToPush, requirements };
+          elementToPush = { ...elementToPush, cutlist: getNewCutlist(nextProject) };
         }
         accProjects.push(elementToPush);
         return accProjects;
@@ -197,11 +196,11 @@ export const useData = () => {
     addProject: () => dispatch!({ type: "ADD_PROJECT" }),
     editProjectHeaderProps: (projectHeaderProps: ProjectHeaderProps) =>
       dispatch!({ type: "EDIT_PROJECT", payload: projectHeaderProps }),
-    addMaterialToProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
+    addMaterialToProject: (payload: { projectId: string; cutlistItem: CutlistItem }) =>
       dispatch!({ type: "ADD_MATERIAL_TO_PROJECT", payload }),
     addMaterialToInventory: (material: PhysicalMaterial) =>
       dispatch!({ type: "ADD_MATERIAL_TO_INVENTORY", payload: material }),
-    updateMaterialInProject: (payload: { projectId: string; requirement: MaterialRequirement }) =>
+    updateMaterialInProject: (payload: { projectId: string; cutlistItem: CutlistItem }) =>
       dispatch!({ type: "UPDATE_MATERIAL_IN_PROJECT", payload }),
     updateMaterialInInventory: (material: PhysicalMaterial) =>
       dispatch!({ type: "UPDATE_MATERIAL_IN_INVENTORY", payload: material }),

@@ -13,7 +13,7 @@ import {
 import { AiFillEdit } from "react-icons/ai";
 import ResponsiveGallery from "react-responsive-gallery";
 
-import { EditableMaterialView, ReadOnlyMaterialView } from "./ProjectRequirementView";
+import { EditableMaterialView, ReadOnlyMaterialView } from "./CutlistView";
 import { Project } from "./schema";
 import { useData } from "./useData";
 import { useUiData } from "./useUiData";
@@ -48,7 +48,7 @@ const ProjectView = () => {
     return <div className="project-view">Welcome!</div>;
   }
 
-  const requirements = selectedProjects.flatMap((project) => project.requirements);
+  const cutlist = selectedProjects.flatMap((project) => project.cutlist);
 
   const getProjectHeader = () => {
     if (selectedProjects.length > 1) {
@@ -81,11 +81,9 @@ const ProjectView = () => {
   const getMaterialView = () => {
     const InnerComponent = () => {
       if (selectedProjects.length > 1) {
-        return <ReadOnlyMaterialView requirements={requirements} />;
+        return <ReadOnlyMaterialView cutlist={cutlist} />;
       }
-      return (
-        <EditableMaterialView projectId={selectedProjects[0].id} requirements={requirements} />
-      );
+      return <EditableMaterialView projectId={selectedProjects[0].id} cutlist={cutlist} />;
     };
 
     return () => (

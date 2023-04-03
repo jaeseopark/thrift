@@ -20,7 +20,7 @@ export type PhysicalMaterial = {
   quantity: number;
 };
 
-export type MaterialRequirement = PhysicalMaterial & { shouldMaintainGrainDirection: boolean };
+export type CutlistItem = PhysicalMaterial & { shouldMaintainGrainDirection: boolean };
 
 export type ProjectHeaderProps = {
   id: string;
@@ -29,7 +29,7 @@ export type ProjectHeaderProps = {
   imageUrls: string; // line-separated image URLs
 };
 
-export type Project = ProjectHeaderProps & { requirements: MaterialRequirement[] };
+export type Project = ProjectHeaderProps & { cutlist: CutlistItem[] };
 
 export type State = {
   projects: Project[];
