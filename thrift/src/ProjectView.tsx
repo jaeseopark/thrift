@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Box,
   Button,
+  Flex,
   FocusLock,
   HStack,
   Heading,
@@ -10,8 +11,8 @@ import {
   Popover,
   PopoverArrow,
   PopoverContent,
-  PopoverFooter,
   PopoverTrigger,
+  Spacer,
   Textarea,
   UnorderedList,
   VStack,
@@ -20,6 +21,7 @@ import { AiFillEdit } from "react-icons/ai";
 import ResponsiveGallery from "react-responsive-gallery";
 
 import { EditableMaterialView, ReadOnlyMaterialView } from "./CutlistView";
+import EditableHeading from "./EditableHeading";
 import { Project } from "./schema";
 import { useData } from "./useData";
 import { useGlobalDrawer } from "./useDrawer";
@@ -33,23 +35,25 @@ const ImageUrlEditTrigger = ({
   onChange: (urls: string[]) => void;
 }) => {
   const { isOpen, onOpen, onClose } = useGlobalDrawer("edit-project-images");
-
   return (
-    <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement="right">
+    <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement="bottom">
       <PopoverTrigger>
         <Button leftIcon={<AiFillEdit />} size="sm" paddingLeft="1.4em" />
       </PopoverTrigger>
-      <PopoverContent p={5}>
-        {isOpen && (
-          <ImageUrlForm
-            urls={urls}
-            onChange={(imageUrls) => {
-              onChange(imageUrls);
-              onClose();
-            }}
-          />
-        )}
-      </PopoverContent>
+      <FocusLock persistentFocus={false}>
+        <PopoverContent p={5} width="30vw" height="30vh">
+          <PopoverArrow />
+          {isOpen && (
+            <ImageUrlForm
+              urls={urls}
+              onChange={(imageUrls) => {
+                onChange(imageUrls);
+                onClose();
+              }}
+            />
+          )}
+        </PopoverContent>
+      </FocusLock>
     </Popover>
   );
 };
@@ -64,13 +68,19 @@ const ImageUrlForm = ({
   const [newUrls, setNewUrls] = useState(urls.join("\n"));
 
   return (
-    <FocusLock persistentFocus={false}>
-      <PopoverArrow />
-      <Textarea value={newUrls} onChange={({ target: { value } }) => setNewUrls(value)} />
-      <PopoverFooter>
-        <Button onClick={() => onChange(newUrls.split("\n").filter((url) => url))}>Save</Button>
-      </PopoverFooter>
-    </FocusLock>
+    <>
+      <Heading as="h3" size="md">
+        Image URL's
+      </Heading>
+      <Textarea
+        value={newUrls}
+        onChange={({ target: { value } }) => setNewUrls(value)}
+        placeholder="Enter one Image URL in each line"
+      />
+      <Button onClick={() => onChange(newUrls.split("\n").filter((url) => url))} colorScheme="teal">
+        Save
+      </Button>
+    </>
   );
 };
 
@@ -80,7 +90,9 @@ const ProjectGallery = ({ projects }: { projects: Project[] }) => {
   const urls = projects.flatMap((p) => p.imageUrls).filter((url) => url);
 
   return (
-    <div className="project-image-gallery">
+    <Flex className="project-image-gallery">
+      <ResponsiveGallery images={urls.map((url) => ({ src: url }))} useLightBox />
+      <Spacer />
       {projects.length === 1 && (
         <ImageUrlEditTrigger
           urls={urls}
@@ -92,13 +104,12 @@ const ProjectGallery = ({ projects }: { projects: Project[] }) => {
           }}
         />
       )}
-      <ResponsiveGallery images={urls.map((url) => ({ src: url }))} useLightBox />
-    </div>
+    </Flex>
   );
 };
 
 const ProjectView = () => {
-  const { projects } = useData();
+  const { projects, editProjectHeaderProps } = useData();
   const { getSelectedProjects } = useUiData();
 
   const selectedProjects = useMemo(
@@ -130,9 +141,19 @@ const ProjectView = () => {
 
     const [project] = selectedProjects;
     return () => (
-      <VStack className="project-header" spacing="1em">
-        <Textarea value={project.name} width="100%" />
-        <Textarea value={project.description} width="100%" />
+      <VStack className="project-header" spacing="1em" height="100%">
+        <div>
+          <EditableHeading
+            defaultValue={project.name}
+            onBlur={(name) => editProjectHeaderProps({ ...project, name })}
+          />
+          <EditableHeading
+            size="md"
+            defaultValue={project.description}
+            onBlur={(description) => editProjectHeaderProps({ ...project, description })}
+          />
+        </div>
+        <Spacer />
       </VStack>
     );
   };

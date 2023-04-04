@@ -47,10 +47,23 @@
 
     .project-header {
       width: 30vw;
+
+      textarea {
+        width: 100%;
+      }
     }
 
     .project-image-gallery {
       width: 20vw;
+      height: 100%;
+      flex-direction: column;
+      border: 1px solid teal;
+      border-radius: 3px;
+
+      textarea {
+        margin: 1.25em 0;
+        height: 100%;
+      }
     }
   }
 }
